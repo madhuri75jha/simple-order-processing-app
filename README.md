@@ -23,5 +23,4 @@ mvn test
 # SCM Polling
 # Polling test update
 
-# Testing Webhook in Jenkins
-# Testing Webhook added 2
+
