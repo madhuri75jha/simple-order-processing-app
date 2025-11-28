@@ -20,8 +20,5 @@ java -jar target/simple-order-processing-app-1.0-SNAPSHOT.jar
 ```bash
 mvn test
 ```
-# SCM Polling
-# Polling test update
-
-# Test Webhook added
-# Tested Webhook added twice
+## SCM POLLING
+# test SCM Polling
