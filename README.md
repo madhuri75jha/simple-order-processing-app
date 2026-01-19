@@ -20,7 +20,7 @@ java -jar target/simple-order-processing-app-1.0-SNAPSHOT.jar
 ```bash
 mvn test
 ```
-# Jenkins webhook integration test update for TEAMS Notify
+# Jenkins webhook integration test updates for TEAMS Notification
 
 # Polling TEST Update
 # Webhook TESTING
