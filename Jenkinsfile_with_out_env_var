@@ -6,7 +6,7 @@ pipeline {
     maven 'maven_3'
   }
 
-    
+    stages{
     stage('Checkout Code') {
       steps{
         git branch: 'main', url: 'https://github.com/madhuri75jha/simple-order-processing-app.git'
