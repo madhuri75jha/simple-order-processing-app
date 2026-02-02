@@ -1,74 +1,61 @@
 pipeline {
+
   agent any
+
+  tools {
+    maven 'maven_3'
+  }
+
   stages {
-    stage('Install Maven') {
-      parallel {
-        stage('Install Maven') {
-          steps {
-            sh '''
-        echo "Installing Maven ${MAVEN_VERSION}"
-        sudo rm -rf /opt/maven
-        cd /tmp
-        wget https://downloads.apache.org/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz
-        tar -xzf apache-maven-${MAVEN_VERSION}-bin.tar.gz
-        sudo mv apache-maven-${MAVEN_VERSION} /opt/maven
-        sudo chown -R ubuntu:ubuntu /opt/maven
-        /opt/maven/bin/mvn -version
-        '''
-          }
-        }
 
-        stage('Build') {
-          steps {
-            sh 'mvn clean package'
-          }
-        }
-
+    stage('Checkout') {
+      steps {
+        git branch: 'main',
+            url: 'https://github.com/madhuri75jha/simple-order-processing-app.git'
       }
     }
 
-    stage('Checkout Code') {
+    stage('Build & Test') {
       parallel {
-        stage('Checkout Code') {
+
+        stage('Build') {
           steps {
-            git(branch: 'main', url: 'https://github.com/madhuri75jha/simple-order-processing-app.git')
+            sh '''
+            echo "Building application..."
+            mvn clean compile
+            '''
           }
         }
 
         stage('Test') {
           steps {
-            sh 'mvn test'
+            sh '''
+            echo "Running tests..."
+            mvn test
+            '''
           }
         }
 
       }
     }
 
-    stage('Build with Maven') {
-      parallel {
-        stage('Build with Maven') {
-          steps {
-            sh 'mvn clean package -Dmaven.test.failure.ignore=true'
-          }
-        }
-
-        stage('Deploy') {
-          steps {
-            sh 'mvn package'
-          }
-        }
-
+    stage('Package') {
+      steps {
+        sh '''
+        echo "Packaging artifact..."
+        mvn package -Dmaven.test.failure.ignore=true
+        '''
       }
     }
 
   }
-  environment {
-    MAVEN_VERSION = '3.9.12'
-  }
+
   post {
+
     success {
       junit '**/target/surefire-reports/TEST-*.xml'
       archiveArtifacts 'target/*.jar'
+      echo 'Build Pipeline Completed Successfully'
     }
 
     failure {
@@ -76,4 +63,5 @@ pipeline {
     }
 
   }
+
 }
