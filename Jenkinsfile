@@ -1,20 +1,25 @@
 pipeline {
-  agent {
-    node {
-      label 'linux'
-    }
 
+  agent { label 'linux' }
+
+  tools {
+    maven 'maven_3'
   }
+
   stages {
+
     stage('Checkout') {
       steps {
-        git(branch: 'main', url: 'https://github.com/madhuri75jha/simple-order-processing-app.git', poll: true, changelog: true)
-        sh 'echo \'Git Checkout\''
+        git branch: 'main',
+            url: 'https://github.com/madhuri75jha/simple-order-processing-app.git'
+        sh 'echo "Git Checkout Completed"'
       }
     }
 
     stage('Build & Test') {
+
       parallel {
+
         stage('Build') {
           steps {
             sh '''
@@ -46,13 +51,9 @@ pipeline {
     }
 
   }
-  tools {
-    maven 'maven_3'
-  }
-  environment {
-    maven_3 = '3.9.9'
-  }
+
   post {
+
     success {
       junit '**/target/surefire-reports/TEST-*.xml'
       archiveArtifacts 'target/*.jar'
@@ -64,4 +65,5 @@ pipeline {
     }
 
   }
+
 }
