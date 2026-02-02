@@ -1,14 +1,16 @@
 pipeline {
-  agent any
-  environment {
-    MAVEN_VERSION = "3.9.12"
-    MAVEN_HOME="/opt/maven"
-    PATH = "/opt/maven/bin:${env.PATH}"
+  agent {
+    node {
+      label 'linux'
+    }
+
   }
   stages {
-    stage('Install Maven'){
-      steps {
-        sh '''
+    stage('Install Maven') {
+      parallel {
+        stage('Install Maven') {
+          steps {
+            sh '''
         echo "Installing Maven ${MAVEN_VERSION}"
         sudo rm -rf /opt/maven
         cd /tmp
@@ -18,29 +20,67 @@ pipeline {
         sudo chown -R ubuntu:ubuntu /opt/maven
         /opt/maven/bin/mvn -version
         '''
-            }
+          }
         }
-    
+
+        stage('Build') {
+          steps {
+            sh 'mvn clean package'
+          }
+        }
+
+      }
+    }
+
     stage('Checkout Code') {
-      steps{
-        git branch: 'main', url: 'https://github.com/madhuri75jha/simple-order-processing-app.git'
+      parallel {
+        stage('Checkout Code') {
+          steps {
+            git(branch: 'main', url: 'https://github.com/madhuri75jha/simple-order-processing-app.git')
+          }
+        }
+
+        stage('Test') {
+          steps {
+            sh 'mvn test'
+          }
+        }
+
       }
     }
 
     stage('Build with Maven') {
-      steps{
-        sh 'mvn clean package -Dmaven.test.failure.ignore=true'
+      parallel {
+        stage('Build with Maven') {
+          steps {
+            sh 'mvn clean package -Dmaven.test.failure.ignore=true'
+          }
+        }
+
+        stage('Deploy') {
+          steps {
+            sh 'mvn package'
+          }
+        }
+
       }
     }
-  }  
+
+  }
+  environment {
+    MAVEN_VERSION = '3.9.12'
+    MAVEN_HOME = '/opt/maven'
+    PATH = "/opt/maven/bin:${env.PATH}"
+  }
   post {
     success {
       junit '**/target/surefire-reports/TEST-*.xml'
       archiveArtifacts 'target/*.jar'
     }
+
     failure {
       echo 'Build Failed'
     }
+
   }
-        
 }
