@@ -64,8 +64,6 @@ pipeline {
   }
   environment {
     MAVEN_VERSION = '3.9.12'
-    MAVEN_HOME = '/opt/maven'
-    PATH = "/opt/maven/bin:${env.PATH}"
   }
   post {
     success {
