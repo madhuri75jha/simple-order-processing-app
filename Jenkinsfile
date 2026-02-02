@@ -1,9 +1,15 @@
 pipeline {
-  agent any
+  agent {
+    node {
+      label 'linux'
+    }
+
+  }
   stages {
     stage('Checkout') {
       steps {
         git(branch: 'main', url: 'https://github.com/madhuri75jha/simple-order-processing-app.git', poll: true, changelog: true)
+        sh 'echo \'Git Checkout\''
       }
     }
 
@@ -42,6 +48,9 @@ pipeline {
   }
   tools {
     maven 'maven_3'
+  }
+  environment {
+    maven_3 = '3.9.9'
   }
   post {
     success {
