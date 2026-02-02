@@ -1,10 +1,5 @@
 pipeline {
-  agent {
-    node {
-      label 'linux'
-    }
-
-  }
+  agent any
   stages {
     stage('Install Maven') {
       parallel {
