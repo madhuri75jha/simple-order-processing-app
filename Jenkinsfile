@@ -1,17 +1,9 @@
 pipeline {
-
   agent any
-
-  tools {
-    maven 'maven_3'
-  }
-
   stages {
-
     stage('Checkout') {
       steps {
-        git branch: 'main',
-            url: 'https://github.com/madhuri75jha/simple-order-processing-app.git'
+        git(branch: 'main', url: 'https://github.com/madhuri75jha/simple-order-processing-app.git')
         sh 'echo "Git Checkout Completed"'
       }
     }
@@ -44,9 +36,10 @@ pipeline {
     }
 
   }
-
+  tools {
+    maven 'maven_3'
+  }
   post {
-
     success {
       junit '**/target/surefire-reports/TEST-*.xml'
       archiveArtifacts 'target/*.jar'
@@ -58,5 +51,4 @@ pipeline {
     }
 
   }
-
 }
