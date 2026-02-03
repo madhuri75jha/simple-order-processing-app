@@ -1,0 +1,62 @@
+pipeline {
+
+    agent any
+
+    parameters {
+        string(
+            name: 'DEPLOY_ENV',
+            defaultValue: 'dev',
+            description: 'Environment to deploy (dev or prod)'
+        )
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                echo 'Checking out source code from GitHub...'
+
+                git branch: 'main',
+                    url: 'https://github.com/madhuri75jha/simple-order-processing-app.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo 'Building the application...'
+            }
+        }
+
+        stage('Run Unit Tests') {
+            when {
+                expression { params.DEPLOY_ENV != 'prod' }
+            }
+            steps {
+                echo 'Running unit tests...'
+            }
+        }
+
+        stage('Deploy to Production') {
+            when {
+                allOf {
+                    branch 'main'
+                    expression { params.DEPLOY_ENV == 'prod' }
+                }
+            }
+            steps {
+                echo 'Deploying application to production...'
+            }
+        }
+    }
+
+    post {
+
+        success {
+            echo 'Pipeline executed successfully!'
+        }
+
+        failure {
+            echo 'Pipeline failed. Please check logs.'
+        }
+    }
+}
