@@ -1,10 +1,12 @@
 pipeline {
   agent any
+
   stages {
+
     stage('Checkout') {
       steps {
-        git(branch: 'main', url: 'https://github.com/madhuri75jha/simple-order-processing-app.git')
-        sh 'echo "Git Checkout Completed"'
+        git branch: 'main',
+            url: 'https://github.com/madhuri75jha/simple-order-processing-app.git'
       }
     }
 
@@ -29,26 +31,23 @@ pipeline {
     stage('Deploy') {
       steps {
         sh '''
-        echo "Deploying application..."
+        echo "Packaging artifact..."
         mvn package -Dmaven.test.failure.ignore=true
         '''
       }
     }
 
   }
-  tools {
-    maven 'maven_3'
-  }
+
   post {
     success {
       junit '**/target/surefire-reports/TEST-*.xml'
       archiveArtifacts 'target/*.jar'
-      echo 'Build Pipeline Completed Successfully'
+      echo 'Pipeline Completed Successfully'
     }
 
     failure {
       echo 'Build Failed'
     }
-
   }
 }
