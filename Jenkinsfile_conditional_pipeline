@@ -3,7 +3,7 @@ agent any
 parameters {
         string(name: 'DEPLOY_ENV',
                 defaultValue: 'dev',
-                description: Environment to Deploy (dev or prod)'
+                description: 'Environment to Deploy (dev or prod)'
                 )
            }
 stages {
