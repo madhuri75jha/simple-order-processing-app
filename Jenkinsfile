@@ -1,5 +1,8 @@
 pipeline {
   agent any
+  tools {
+    maven 'maven_3'
+  }
   stages {
     stage('Checkout') {
       steps {
@@ -10,43 +13,37 @@ pipeline {
     stage('Build') {
       steps {
         sh '''
-        echo "Building application..."
-        mvn clean compile
+        echo "Building application pipeline..."
+        mvn clean package
         '''
       }
     }
 
-    stage('Test') {
+  stage('Deploy Application') {
       steps {
+        echo 'Starting Application Deployment...'
         sh '''
-        echo "Running tests..."
-        mvn test
-        '''
-      }
-    }
+        echo "Creating deployment directory..."
+        mkdir -p /tmp/orderapp-deploy/
 
-    stage('Deploy') {
-      steps {
-        sh '''
-        echo "Packaging artifact..."
-        mvn package -Dmaven.test.failure.ignore=true
+        echo "Copying JAR to deployment directory"
+        cp target/*.jar /tmp/orderapp-deploy/
+
+        echo "Listing deployed files"
+        ls -l /tmp/orderapp-deploy/
         '''
       }
     }
 
   }
-  tools {
-    maven 'maven_3'
-  }
+  
   post {
     success {
-      junit '**/target/surefire-reports/TEST-*.xml'
-      archiveArtifacts 'target/*.jar'
-      echo 'Pipeline Completed Successfully'
+      echo 'Pipeline Executed Successfully. Application DEPLOYED.'
     }
 
     failure {
-      echo 'Build Failed'
+      echo 'Pipeline Failed. Please Check LOGS.'
     }
 
   }
